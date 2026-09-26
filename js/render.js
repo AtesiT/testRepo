@@ -100,7 +100,7 @@ export class Renderer {
         vy: Math.sin(angle) * speed,
         life: 0,
         ttl: 380 + Math.random() * 420,
-        radius: this.cell * (0.05 + Math.random() * 0.08),
+        radius: this.cell * (0.075 + Math.random() * 0.095),
         color,
       });
     }
@@ -222,7 +222,7 @@ export class Renderer {
     const x = this.#centerX(food.x);
     const y = this.#centerY(food.y);
     const pulse = this.reducedMotion ? 1 : 1 + 0.05 * Math.sin(timeMs / 230);
-    const r = this.cell * 0.3 * pulse;
+    const r = this.cell * 0.34 * pulse;
 
     ctx.save();
     if (!this.reducedMotion) {
@@ -251,6 +251,10 @@ export class Renderer {
     ctx.beginPath();
     ctx.ellipse(r * 0.42, -r * 0.92, r * 0.42, r * 0.2, -0.7, 0, Math.PI * 2);
     ctx.fill();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.beginPath();
+    ctx.arc(-r * 0.32, -r * 0.36, r * 0.17, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
   }
 
@@ -263,7 +267,7 @@ export class Renderer {
     const ttlRatio = Math.max(0, Math.min(1, bonus.ttl / BONUS_TTL_STEPS));
     const blinking = bonus.ttl <= 6 && !this.reducedMotion;
     const alpha = blinking ? 0.4 + 0.6 * Math.abs(Math.sin(timeMs / 90)) : 1;
-    const r = this.cell * 0.34;
+    const r = this.cell * 0.36;
 
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -292,9 +296,9 @@ export class Renderer {
 
     ctx.save();
     ctx.translate(x, y);
-    ctx.globalAlpha = alpha * 0.85;
-    ctx.strokeStyle = COLORS.bonusDeep;
-    ctx.lineWidth = Math.max(1.5, this.cell * 0.07);
+    ctx.globalAlpha = alpha * (ttlRatio < 0.5 ? 0.9 : 0.4);
+    ctx.strokeStyle = ttlRatio < 0.5 ? COLORS.bonusDeep : COLORS.bonus;
+    ctx.lineWidth = Math.max(1.2, this.cell * 0.055);
     ctx.lineCap = 'round';
     ctx.beginPath();
     ctx.arc(0, 0, this.cell * 0.45, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * ttlRatio);
@@ -390,7 +394,7 @@ export class Renderer {
     ctx.save();
     for (const particle of this.particles) {
       const progress = particle.life / particle.ttl;
-      ctx.globalAlpha = Math.max(0, 1 - progress) * 0.9;
+      ctx.globalAlpha = Math.max(0, 1 - progress * progress);
       ctx.fillStyle = particle.color;
       ctx.beginPath();
       ctx.arc(particle.x, particle.y, particle.radius * (1 - progress * 0.6), 0, Math.PI * 2);

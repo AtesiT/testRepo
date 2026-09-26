@@ -57,6 +57,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: clamp(8px, 1.6vh, 16px);
+  height: 100vh; /* фолбэк для браузеров без dvh */
   height: 100dvh;
   max-width: 920px;
   margin: 0 auto;
