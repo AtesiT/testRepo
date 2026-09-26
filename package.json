@@ -1,0 +1,25 @@
+{
+  "name": "snake-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Классическая «Змейка» на vanilla JS + Canvas без зависимостей и сборки",
+  "type": "module",
+  "scripts": {
+    "start": "node tools/server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:dom": "node --test test/dom.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "snake",
+    "canvas",
+    "game",
+    "vanilla-js"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "jsdom": "^25.0.1"
+  }
+}

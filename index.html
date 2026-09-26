@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#070b16" />
+    <meta
+      name="description"
+      content="Классическая «Змейка» на Canvas: три уровня сложности, сквозные стены, рекорды в localStorage и управление свайпами."
+    />
+    <title>Змейка — классика на Canvas</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b1220'/%3E%3Cpath d='M8 21h6v-7h6v7h4' stroke='%233ddc84' stroke-width='3.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='24' cy='10' r='3' fill='%23ff5f6d'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <div>
+            <h1 class="brand__title">Змейка</h1>
+            <span class="badge" id="modeBadge">Стены</span>
+          </div>
+        </div>
+
+        <div class="hud" role="group" aria-label="Статистика партии">
+          <div class="stat">
+            <span class="stat__label">Очки</span>
+            <strong class="stat__value" id="scoreValue">0</strong>
+          </div>
+          <div class="stat">
+            <span class="stat__label">Рекорд</span>
+            <strong class="stat__value" id="bestValue">0</strong>
+          </div>
+          <div class="stat">
+            <span class="stat__label">Длина</span>
+            <strong class="stat__value" id="lengthValue">3</strong>
+          </div>
+          <div class="stat">
+            <span class="stat__label">Уровень</span>
+            <strong class="stat__value" id="levelValue">1</strong>
+          </div>
+        </div>
+      </header>
+
+      <main class="stage" id="stage">
+        <div class="board" id="board">
+          <canvas id="game" width="480" height="480" role="img" aria-label="Игровое поле «Змейки»"></canvas>
+
+          <div class="countdown" id="countdown" hidden aria-hidden="true">
+            <span class="countdown__value" id="countdownValue">3</span>
+          </div>
+
+          <div class="overlay" id="overlay" hidden>
+            <section class="panel" id="screen-menu">
+              <h2 class="panel__title">Змейка</h2>
+              <p class="panel__text">
+                Собирай яблоки и расти. Каждое пятое яблоко открывает золотой бонус, который тает на глазах.
+              </p>
+
+              <div class="field">
+                <span class="field__label" id="difficultyLabel">Сложность</span>
+                <div class="segmented" role="radiogroup" aria-labelledby="difficultyLabel">
+                  <button type="button" class="segmented__item" data-difficulty="easy" role="radio" aria-checked="false">
+                    Легко
+                  </button>
+                  <button type="button" class="segmented__item" data-difficulty="normal" role="radio" aria-checked="true">
+                    Норма
+                  </button>
+                  <button type="button" class="segmented__item" data-difficulty="hard" role="radio" aria-checked="false">
+                    Хард
+                  </button>
+                </div>
+              </div>
+
+              <div class="field field--options">
+                <label class="switch">
+                  <input type="checkbox" id="wrapToggle" />
+                  <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+                  <span class="switch__label">Сквозные стены</span>
+                </label>
+                <label class="switch">
+                  <input type="checkbox" id="soundToggle" checked />
+                  <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+                  <span class="switch__label">Звук</span>
+                </label>
+              </div>
+
+              <button type="button" class="btn btn--primary" id="startButton">Начать игру</button>
+              <p class="keyboard-hint">← ↑ → ↓ или WASD — движение · Пробел — пауза · R — заново</p>
+            </section>
+
+            <section class="panel" id="screen-pause" hidden>
+              <h2 class="panel__title">Пауза</h2>
+              <div class="score-grid">
+                <div class="score-grid__item"><span>Очки</span><strong id="pauseScore">0</strong></div>
+                <div class="score-grid__item"><span>Длина</span><strong id="pauseLength">3</strong></div>
+              </div>
+              <button type="button" class="btn btn--primary" id="resumeButton">Продолжить</button>
+              <button type="button" class="btn" id="pauseRestartButton">Начать заново</button>
+              <button type="button" class="btn btn--ghost" id="pauseMenuButton">В меню</button>
+            </section>
+
+            <section class="panel" id="screen-over" hidden>
+              <h2 class="panel__title" id="overTitle">Игра окончена</h2>
+              <p class="panel__text" id="overReason">Змейка врезалась в стену.</p>
+              <p class="record-badge" id="recordBadge" hidden>Новый рекорд!</p>
+              <div class="score-grid">
+                <div class="score-grid__item"><span>Очки</span><strong id="overScore">0</strong></div>
+                <div class="score-grid__item"><span>Рекорд</span><strong id="overBest">0</strong></div>
+                <div class="score-grid__item"><span>Длина</span><strong id="overLength">3</strong></div>
+              </div>
+              <button type="button" class="btn btn--primary" id="againButton">Играть снова</button>
+              <button type="button" class="btn btn--ghost" id="menuButton">В меню</button>
+            </section>
+          </div>
+        </div>
+      </main>
+
+      <footer class="toolbar">
+        <div class="dpad" id="dpad" aria-label="Управление">
+          <button type="button" class="dpad__btn dpad__btn--up" data-dir="up" aria-label="Вверх">▲</button>
+          <button type="button" class="dpad__btn dpad__btn--left" data-dir="left" aria-label="Влево">◀</button>
+          <button type="button" class="dpad__btn dpad__btn--down" data-dir="down" aria-label="Вниз">▼</button>
+          <button type="button" class="dpad__btn dpad__btn--right" data-dir="right" aria-label="Вправо">▶</button>
+        </div>
+
+        <div class="toolbar__actions">
+          <button type="button" class="btn btn--small" id="pauseButton">Пауза</button>
+          <button type="button" class="btn btn--small" id="restartButton">Заново</button>
+          <button type="button" class="btn btn--small" id="soundButton" aria-pressed="true">Звук: вкл</button>
+        </div>
+      </footer>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
